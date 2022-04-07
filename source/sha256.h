@@ -3,7 +3,7 @@
 
 #include <string>
 #include <bit> // For std::rotr
-#include <bitset> // For Binary
+#include <bitset> // For std::bitset
 #include <iomanip> // For stringstream
 
 namespace woXrooX{
