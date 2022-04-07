@@ -72,6 +72,15 @@ namespace woXrooX{
       //////////////// Initialize working variables to current hash value (Compression)
       // tmpW1 = us1(e) + choice(e, f, g) + h + k[0] + data_32_bit_words[0][0];
       // tmpW2 = us0(a) + majority(a, b, c);
+      uint32_t h0 = this->h0;
+      uint32_t h1 = this->h1;
+      uint32_t h2 = this->h2;
+      uint32_t h3 = this->h3;
+      uint32_t h4 = this->h4;
+      uint32_t h5 = this->h5;
+      uint32_t h6 = this->h6;
+      uint32_t h7 = this->h7;
+
       uint32_t a = this->h0;
       uint32_t b = this->h1;
       uint32_t c = this->h2;
@@ -80,15 +89,6 @@ namespace woXrooX{
       uint32_t f = this->h5;
       uint32_t g = this->h6;
       uint32_t h = this->h7;
-
-      uint32_t h0 = 0;
-      uint32_t h1 = 0;
-      uint32_t h2 = 0;
-      uint32_t h3 = 0;
-      uint32_t h4 = 0;
-      uint32_t h5 = 0;
-      uint32_t h6 = 0;
-      uint32_t h7 = 0;
 
       for(int i = 0; i < data_512_bit_chunks_size; i++){
         for(int j = 0; j < 64; j++){
@@ -118,14 +118,23 @@ namespace woXrooX{
           b = a;
           a = std::bitset<32>(tmp_w1).to_ulong() + std::bitset<32>(tmp_w2).to_ulong();
         }
-        h0 = this->h0 + a;
-        h1 = this->h1 + b;
-        h2 = this->h2 + c;
-        h3 = this->h3 + d;
-        h4 = this->h4 + e;
-        h5 = this->h5 + f;
-        h6 = this->h6 + g;
-        h7 = this->h7 + h;
+        h0 = h0 + a;
+        h1 = h1 + b;
+        h2 = h2 + c;
+        h3 = h3 + d;
+        h4 = h4 + e;
+        h5 = h5 + f;
+        h6 = h6 + g;
+        h7 = h7 + h;
+
+        a = h0;
+        b = h1;
+        c = h2;
+        d = h3;
+        e = h4;
+        f = h5;
+        g = h6;
+        h = h7;
       }
 
       // To Hex String
