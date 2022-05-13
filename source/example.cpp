@@ -1,10 +1,11 @@
 #include <iostream>
 #include "sha256.h"
 
-int main(int argc, char const *argv[]){
-
-  woXrooX::Sha256 hash("data");
-  std::cout << hash.digest() << '\n';
+int main(){
+  std::string data = "Data";
+  woXrooX::MET met;
+  woXrooX::Sha256 hash;
+  std::cout << hash.digest(data) << '\n';
 
   return 0;
 }
