@@ -9,22 +9,22 @@
 namespace woXrooX{
   class Sha256{
   public:
-    Sha256(const std::string &data) : data(data){
-      this->hash();
-    }
-    ~Sha256(){}
+    Sha256(){}
 
-    // Returns Hashed Data AKA Result
-    std::string digest(){
+    // Returns Hashed Data AKA Result For Given Data
+    const std::string& digest(const std::string &data){
+      this->data = data;
+      this->hash();
       return this->result;
     }
+
   private:
     void hash(){
       std::string data_in_binary;
       int zero_bits_size = zero_bits(this->data.length()*8);
 
       //////////////// Converting Data To Binary
-      for(int i = 0; i < this->data.length(); i++){
+      for(int i = 0; i < this->data.length(); ++i){
         data_in_binary.append(std::bitset<8>(this->data[i]).to_string());
       }
 
@@ -32,7 +32,7 @@ namespace woXrooX{
       data_in_binary.append("1");
 
       //////////////// Filling With 0's
-      for(int i = 0; i < zero_bits_size; i++){
+      for(int i = 0; i < zero_bits_size; ++i){
         data_in_binary.append("0");
       }
 
@@ -42,22 +42,22 @@ namespace woXrooX{
       //////////////// Break data_in_binary Into 512-bit Chunks
       unsigned int data_512_bit_chunks_size = data_in_binary.length()/512;
       std::string data_512_bit_chunks[data_512_bit_chunks_size];
-      for(int i = 0; i < data_512_bit_chunks_size; i++){
+      for(int i = 0; i < data_512_bit_chunks_size; ++i){
         data_512_bit_chunks[i] = data_in_binary.substr(512*i, 512);
       }
 
       //////////////// Creating A 64-Entry Message Schedule Array w[0..63] Of 32-Bit Words. Spliting Each Block Into 32-bit Words (512 / 32 = 16)
       std::string data_32_bit_words[data_512_bit_chunks_size][64];
-      for(int i = 0; i < data_512_bit_chunks_size; i++){
-        for(int j = 0; j < 16; j++){
+      for(int i = 0; i < data_512_bit_chunks_size; ++i){
+        for(int j = 0; j < 16; ++j){
           data_32_bit_words[i][j] = data_512_bit_chunks[i].substr(32*j, 32);
         }
       }
 
       //////////////// Extend The First 16 Words Into The Remaining 48 Words w[16..63] Of The Message Schedule Array
       // data_32_bit_words[i][j] = ls1(j-2)+(j-7)+ls0(j-15)+(j-16)
-      for(int i = 0; i < data_512_bit_chunks_size; i++){
-        for(int j = 16; j < 64; j++){
+      for(int i = 0; i < data_512_bit_chunks_size; ++i){
+        for(int j = 16; j < 64; ++j){
           data_32_bit_words[i][j] =
             std::bitset<32>(
               ls1(std::bitset<32>(data_32_bit_words[i][j-2])).to_ulong()+
@@ -72,26 +72,26 @@ namespace woXrooX{
       //////////////// Initialize working variables to current hash value (Compression)
       // tmpW1 = us1(e) + choice(e, f, g) + h + k[0] + data_32_bit_words[0][0];
       // tmpW2 = us0(a) + majority(a, b, c);
-      uint32_t h0 = this->h0;
-      uint32_t h1 = this->h1;
-      uint32_t h2 = this->h2;
-      uint32_t h3 = this->h3;
-      uint32_t h4 = this->h4;
-      uint32_t h5 = this->h5;
-      uint32_t h6 = this->h6;
-      uint32_t h7 = this->h7;
+      uint32_t h0 = H0;
+      uint32_t h1 = H1;
+      uint32_t h2 = H2;
+      uint32_t h3 = H3;
+      uint32_t h4 = H4;
+      uint32_t h5 = H5;
+      uint32_t h6 = H6;
+      uint32_t h7 = H7;
 
-      uint32_t a = this->h0;
-      uint32_t b = this->h1;
-      uint32_t c = this->h2;
-      uint32_t d = this->h3;
-      uint32_t e = this->h4;
-      uint32_t f = this->h5;
-      uint32_t g = this->h6;
-      uint32_t h = this->h7;
+      uint32_t a = h0;
+      uint32_t b = h1;
+      uint32_t c = h2;
+      uint32_t d = h3;
+      uint32_t e = h4;
+      uint32_t f = h5;
+      uint32_t g = h6;
+      uint32_t h = h7;
 
-      for(int i = 0; i < data_512_bit_chunks_size; i++){
-        for(int j = 0; j < 64; j++){
+      for(int i = 0; i < data_512_bit_chunks_size; ++i){
+        for(int j = 0; j < 64; ++j){
           std::string tmp_w1 =
             std::bitset<32>(
               us1(e).to_ulong()+
@@ -140,8 +140,7 @@ namespace woXrooX{
       // To Hex String
       std::stringstream ss;
       ss << std::hex << h0 << h1 << h2 << h3 << h4 << h5 << h6 << h7;
-      std::string result(ss.str());
-      this->result = result;
+      this->result = ss.str();
     }
 
     // Calculates How Many Bits Needs To Be Filled With 0's
@@ -216,19 +215,18 @@ namespace woXrooX{
     std::string data;
     std::string result;
 
-
-    // Initialize hash values: (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19)
-    const uint32_t h0 = 0x6a09e667;
-    const uint32_t h1 = 0xbb67ae85;
-    const uint32_t h2 = 0x3c6ef372;
-    const uint32_t h3 = 0xa54ff53a;
-    const uint32_t h4 = 0x510e527f;
-    const uint32_t h5 = 0x9b05688c;
-    const uint32_t h6 = 0x1f83d9ab;
-    const uint32_t h7 = 0x5be0cd19;
+    // Compile Time Constants hash values: (first 32 bits of the fractional parts of the square roots of the first 8 primes 2..19)
+    constexpr static uint32_t H0 = 0x6a09e667;
+    constexpr static uint32_t H1 = 0xbb67ae85;
+    constexpr static uint32_t H2 = 0x3c6ef372;
+    constexpr static uint32_t H3 = 0xa54ff53a;
+    constexpr static uint32_t H4 = 0x510e527f;
+    constexpr static uint32_t H5 = 0x9b05688c;
+    constexpr static uint32_t H6 = 0x1f83d9ab;
+    constexpr static uint32_t H7 = 0x5be0cd19;
 
     // Initialize array of round constants: (first 32 bits of the fractional parts of the cube roots of the first 64 primes 2..311)
-    const uint32_t K[64] = {
+    constexpr static uint32_t K[64] = {
       0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
       0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
       0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
