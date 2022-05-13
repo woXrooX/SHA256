@@ -9,8 +9,6 @@
 namespace woXrooX{
   class Sha256{
   public:
-    Sha256(){}
-
     // Returns Hashed Data AKA Result For Given Data
     const std::string& digest(const std::string &data){
       this->data = data;
